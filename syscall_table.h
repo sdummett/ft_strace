@@ -1,7 +1,7 @@
 #ifndef SYSCALL_TABLE_H
 #define SYSCALL_TABLE_H
 
-const char *syscall_names[] = {
+const char *g_syscall_names[] = {
 
 	[0] = "read",
 	[1] = "write",

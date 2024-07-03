@@ -19,7 +19,18 @@
 
 /* The Makefile generated a syscall string
  * table using the `ausyscall` command
-*/
-#include "syscall_table.h"
+ */
+// #include "syscall_table.h"
+
+void handle_signals(pid_t tracee_pid, int status);
+void handle_syscalls(pid_t tracee_pid);
+
+#define FATAL(...)                               \
+	do                                           \
+	{                                            \
+		fprintf(stderr, "strace: " __VA_ARGS__); \
+		fputc('\n', stderr);                     \
+		exit(EXIT_FAILURE);                      \
+	} while (0)
 
 #endif

@@ -18,6 +18,8 @@ CFLAGS = -Wall -Wextra -Werror
 #       SOURCES                                                                #
 # **************************************************************************** #
 SRCS = srcs/main.c \
+		srcs/signals.c \
+		srcs/syscalls.c \
 
 SYS_TAB_H = syscall_table.h
 
@@ -46,7 +48,7 @@ $(SYS_TAB_H):
 	@echo "[+] Generating syscall_table.h"
 	@echo -e "#ifndef SYSCALL_TABLE_H" > $(SYS_TAB_H)
 	@echo -e "#define SYSCALL_TABLE_H\n" >> $(SYS_TAB_H)
-	@echo -e "const char *syscall_names[] = {\n" >> $(SYS_TAB_H)
+	@echo -e "const char *g_syscall_names[] = {\n" >> $(SYS_TAB_H)
 	@ausyscall --dump | awk 'NR > 1 { printf "\t[%s] = \"%s\",\n", toupper($$1), $$2 }' >> $(SYS_TAB_H)
 	@echo -e "};\n" >> $(SYS_TAB_H)
 	@echo "#endif //SYSCALL_TABLE_H" >> $(SYS_TAB_H)
