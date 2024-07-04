@@ -1,2 +1,4 @@
 ft_strace
 objs/
+.vscode
+print_signals
