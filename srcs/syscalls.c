@@ -1,7 +1,7 @@
 #include "ft_strace.h"
 #include "syscall_table.h"
 
-void handle_syscalls(pid_t tracee_pid)
+void handle_syscall(pid_t tracee_pid)
 {
 	/* Gather system call arguments */
 	struct user_regs_struct regs;

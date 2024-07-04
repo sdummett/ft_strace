@@ -22,8 +22,10 @@
  */
 // #include "syscall_table.h"
 
-void handle_signals(pid_t tracee_pid, int status);
-void handle_syscalls(pid_t tracee_pid);
+void		handle_signal(pid_t tracee_pid);
+const char	*signal_name(int signo);
+const char	*siginfo_code_name(int si_code);
+void		handle_syscall(pid_t tracee_pid);
 
 #define FATAL(...)                               \
 	do                                           \
