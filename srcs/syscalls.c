@@ -32,4 +32,5 @@ void handle_syscall(pid_t tracee_pid)
 
 	/* Print system call result */
 	fprintf(stderr, " = %ld\n", (long)regs.rax);
+	ptrace(PTRACE_SYSCALL, tracee_pid, 0, 0);
 }

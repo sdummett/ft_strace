@@ -20,12 +20,13 @@ int do_trace(pid_t tracee_pid)
 	 */
 	ptrace(PTRACE_SETOPTIONS, tracee_pid, 0, PTRACE_O_EXITKILL | PTRACE_O_TRACESYSGOOD);
 
+	/* Enter next system call */
+	if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, 0) == -1)
+		FATAL("%s", strerror(errno));
+
 	while (1)
 	{
-		/* Enter next system call */
-		if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, 0) == -1)
-			FATAL("%s", strerror(errno));
-
+		// printf("[FT_STRACE PID]: %d\n", getpid());
 		int status;
 		if (waitpid(tracee_pid, &status, 0) == -1)
 			FATAL("%s", strerror(errno));

@@ -3,7 +3,7 @@
 void print_siginfo(siginfo_t *siginfo)
 {
 	char siginfo_str[128];
-	// char *signo_str = strsignal(siginfo->si_signo);
+
 	snprintf(siginfo_str, 128, "{si_signo=%s, si_code=%s, si_pid=%d, si_uid=%d}",
 			 signal_name(siginfo->si_signo), siginfo_code_name(siginfo->si_code), siginfo->si_pid, siginfo->si_uid);
 	printf("--- %s %s ---\n", signal_name(siginfo->si_signo), siginfo_str);
@@ -14,6 +14,7 @@ void handle_signal(pid_t tracee_pid)
 	siginfo_t siginfo;
 	ptrace(PTRACE_GETSIGINFO, tracee_pid, NULL, &siginfo);
 	print_siginfo(&siginfo);
+	ptrace(PTRACE_SYSCALL, tracee_pid, 0, siginfo.si_signo);
 }
 
 // Function to convert signo to string
