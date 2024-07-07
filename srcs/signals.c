@@ -12,9 +12,11 @@ void print_siginfo(siginfo_t *siginfo)
 void handle_signal(pid_t tracee_pid)
 {
 	siginfo_t siginfo;
-	ptrace(PTRACE_GETSIGINFO, tracee_pid, NULL, &siginfo);
+	if (ptrace(PTRACE_GETSIGINFO, tracee_pid, NULL, &siginfo) == -1)
+		pr_error("handle_signal", "ptrace(PTRACE_GETSIGINFO)");
 	print_siginfo(&siginfo);
-	ptrace(PTRACE_SYSCALL, tracee_pid, 0, siginfo.si_signo);
+	if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, siginfo.si_signo))
+		pr_error("handle_signal", "ptrace(PTRACE_SYSCALL)");
 }
 
 // Function to convert signo to string

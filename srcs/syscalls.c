@@ -6,7 +6,7 @@ void handle_syscall(pid_t tracee_pid)
 	/* Gather system call arguments */
 	struct user_regs_struct regs;
 	if (ptrace(PTRACE_GETREGS, tracee_pid, 0, &regs) == -1)
-		FATAL("%s", strerror(errno));
+		pr_error("handle_syscall", "ptrace(PTRACE_GETREGS)");
 	long syscall = regs.orig_rax;
 
 	/* Print a representation of the system call */
@@ -17,9 +17,9 @@ void handle_syscall(pid_t tracee_pid)
 
 	/* Run system call and stop on exit */
 	if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, 0) == -1)
-		FATAL("%s", strerror(errno));
+		pr_error("handle_syscall", "ptrace(PTRACE_SYSCALL)");
 	if (waitpid(tracee_pid, 0, 0) == -1)
-		FATAL("%s", strerror(errno));
+		pr_error("handle_syscall", "waitpid");
 
 	/* Get system call result */
 	if (ptrace(PTRACE_GETREGS, tracee_pid, 0, &regs) == -1)
@@ -27,10 +27,11 @@ void handle_syscall(pid_t tracee_pid)
 		fputs(" = ?\n", stderr);
 		if (errno == ESRCH)
 			exit(regs.rdi); // system call was _exit(2) or similar
-		FATAL("%s", strerror(errno));
+		pr_error("handle_syscall", "ptrace(PTRACE_GETREGS)");
 	}
 
 	/* Print system call result */
 	fprintf(stderr, " = %ld\n", (long)regs.rax);
-	ptrace(PTRACE_SYSCALL, tracee_pid, 0, 0);
+	if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, 0) == -1)
+		pr_error("handle_syscall", "ptrace(PTRACE_SYSCALL)");
 }

@@ -1,35 +1,43 @@
 #include "ft_strace.h"
 
+void pr_error(char *function, char *syscall) {
+	fprintf(stderr, "ft_strace: %s: %s: %s.\n", function, syscall, strerror(errno));
+	exit(EXIT_FAILURE);
+}
+
 int do_child(char **argv)
 {
 	ptrace(PTRACE_TRACEME);
 	/* Because we're now a tracee, execvp will block until the parent
 	 * attaches and allows us to continue. */
-	return execvp(argv[1], argv + 1);
-	// FATAL("%s", strerror(errno));
+	if (execvp(argv[1], argv + 1))
+		pr_error("do_child", "execvp");
+	return 0;
 }
 
 int do_trace(pid_t tracee_pid)
 {
 	/* parent */
 	/* sync with execvp */
-	waitpid(tracee_pid, 0, 0);
+	if (waitpid(tracee_pid, 0, 0) < 0)
+		pr_error("do_trace", "waitpid");
 
 	/*	PTRACE_O_EXITKILL: ???
 	 * 	PTRACE_O_TRACESYSGOOD: ???
 	 */
-	ptrace(PTRACE_SETOPTIONS, tracee_pid, 0, PTRACE_O_EXITKILL | PTRACE_O_TRACESYSGOOD);
+	if (ptrace(PTRACE_SETOPTIONS, tracee_pid, 0, PTRACE_O_EXITKILL | PTRACE_O_TRACESYSGOOD) == -1)
+		pr_error("do_trace", "ptrace(PTRACE_SETOPTIONS)");
 
 	/* Enter next system call */
 	if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, 0) == -1)
-		FATAL("%s", strerror(errno));
+		pr_error("do_trace", "ptrace(PTRACE_SYSCALL)");
 
 	while (1)
 	{
 		// printf("[FT_STRACE PID]: %d\n", getpid());
 		int status;
 		if (waitpid(tracee_pid, &status, 0) == -1)
-			FATAL("%s", strerror(errno));
+			pr_error("do_trace", "waitpid");
 
 		int sig = WSTOPSIG(status);
 
@@ -58,11 +66,11 @@ int do_trace(pid_t tracee_pid)
 int main(int argc, char *argv[])
 {
 	if (argc <= 1)
-		FATAL("too few arguments: %d", argc);
+		fprintf(stderr, "too few arguments: %d", argc);
 
 	pid_t pid = fork();
 	if (pid == -1)
-		FATAL("%s", strerror(errno));
+		pr_error("main", "fork");
 	else if (pid == 0)
 		return do_child(argv);
 	return do_trace(pid);

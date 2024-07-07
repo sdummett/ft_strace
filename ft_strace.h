@@ -26,13 +26,7 @@ void		handle_signal(pid_t tracee_pid);
 const char	*signal_name(int signo);
 const char	*siginfo_code_name(int si_code);
 void		handle_syscall(pid_t tracee_pid);
+void		pr_error(char *function, char *syscall);
 
-#define FATAL(...)                               \
-	do                                           \
-	{                                            \
-		fprintf(stderr, "strace: " __VA_ARGS__); \
-		fputc('\n', stderr);                     \
-		exit(EXIT_FAILURE);                      \
-	} while (0)
 
 #endif
