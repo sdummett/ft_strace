@@ -7,9 +7,9 @@ void pr_error(char *function, char *syscall) {
 
 int do_child(char **argv)
 {
-	ptrace(PTRACE_TRACEME);
 	/* Because we're now a tracee, execvp will block until the parent
 	 * attaches and allows us to continue. */
+	raise(SIGSTOP);
 	if (execvp(argv[1], argv + 1))
 		pr_error("do_child", "execvp");
 	return 0;
@@ -19,7 +19,10 @@ int do_trace(pid_t tracee_pid)
 {
 	/* parent */
 	/* sync with execvp */
-	if (waitpid(tracee_pid, 0, 0) < 0)
+	if (ptrace(PTRACE_SEIZE, tracee_pid, 0, 0) == -1)
+		pr_error("do_trace", "ptrace(PTRACE_SEIZE)");
+
+	if (waitpid(tracee_pid, 0, 0) == -1)
 		pr_error("do_trace", "waitpid");
 
 	/*	PTRACE_O_EXITKILL: ???
