@@ -1,22 +1,18 @@
 #include "ft_strace.h"
 
-void print_siginfo(siginfo_t *siginfo)
+int print_siginfo(pid_t tracee_pid)
 {
 	char siginfo_str[128];
 
-	snprintf(siginfo_str, 128, "{si_signo=%s, si_code=%s, si_pid=%d, si_uid=%d}",
-			 signal_name(siginfo->si_signo), siginfo_code_name(siginfo->si_code), siginfo->si_pid, siginfo->si_uid);
-	printf("--- %s %s ---\n", signal_name(siginfo->si_signo), siginfo_str);
-}
-
-void handle_signal(pid_t tracee_pid)
-{
 	siginfo_t siginfo;
 	if (ptrace(PTRACE_GETSIGINFO, tracee_pid, NULL, &siginfo) == -1)
 		pr_error("handle_signal", "ptrace(PTRACE_GETSIGINFO)");
-	print_siginfo(&siginfo);
-	if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, siginfo.si_signo))
-		pr_error("handle_signal", "ptrace(PTRACE_SYSCALL)");
+
+	snprintf(siginfo_str, 128, "{si_signo=%s, si_code=%s, si_pid=%d, si_uid=%d}",
+			 signal_name(siginfo.si_signo), siginfo_code_name(siginfo.si_code), siginfo.si_pid, siginfo.si_uid);
+	printf("--- %s %s ---\n", signal_name(siginfo.si_signo), siginfo_str);
+
+	return siginfo.si_signo;
 }
 
 // Function to convert signo to string
