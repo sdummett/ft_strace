@@ -1,11 +1,5 @@
 #include "ft_strace.h"
 
-void print_error_and_exit(const char *function, const char *syscall)
-{
-	fprintf(stderr, "ft_strace: %s: %s: %s.\n", function, syscall, strerror(errno));
-	exit(EXIT_FAILURE);
-}
-
 int execute_tracee(char **argv)
 {
 	// Indique au parent qu'il peut attacher ce processus

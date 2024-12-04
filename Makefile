@@ -12,7 +12,7 @@ CC = cc
 #       FLAGS         #
 # ******************* #
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -D_GNU_SOURCE
 
 # ******************* #
 #       SOURCES       #
@@ -20,6 +20,8 @@ CFLAGS = -Wall -Wextra -Werror
 SRCS = srcs/main.c \
 		srcs/signals.c \
 		srcs/syscalls.c \
+		srcs/utils.c \
+		srcs/format_write.c
 
 SYS_TAB_H = syscall_table.h
 
