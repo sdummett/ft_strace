@@ -78,6 +78,18 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	struct stat file_stat;
+	char *file_path = get_full_path(argv[1]);
+
+	if (!file_path || stat(file_path, &file_stat) < 0)
+	{
+		fprintf(stderr, "%s: Can't stat '%s': %s\n", argv[0], argv[1], strerror(errno));
+		return 1;
+	}
+
+	printf("Found file: %s\n", file_path);
+	free(file_path);
+
 	pid_t pid = fork();
 	if (pid == -1)
 		print_error_and_exit("main", "fork");

@@ -30,6 +30,43 @@ void escape_string(const char *input, char *output, size_t max_length)
 	output[j] = '\0';
 }
 
+char *get_full_path(const char *filename)
+{
+	struct stat file_stat;
+
+	// If the file is like: './binary'
+	if (filename[0] == '.')
+	{
+		char full_path[4096];
+		char cwd[4096];
+		snprintf(full_path, sizeof(full_path), "%s%s", getcwd(cwd, sizeof(cwd)), filename + 1);
+		if (stat(filename, &file_stat) == 0)
+			return strdup(filename);
+	}
+
+	char *path = getenv("PATH");
+	if (!path)
+		return NULL;
+
+	char *paths = strdup(path);
+	char *dir = strtok(paths, ":");
+
+	while (dir)
+	{
+		char full_path[4096];
+		snprintf(full_path, sizeof(full_path), "%s/%s", dir, filename);
+		if (stat(full_path, &file_stat) == 0)
+		{
+			free(paths);
+			return strdup(full_path);
+		}
+		dir = strtok(NULL, ":");
+	}
+
+	free(paths);
+	return NULL;
+}
+
 void print_error_and_exit(const char *function, const char *syscall)
 {
 	fprintf(stderr, "ft_strace: %s: %s: %s.\n", function, syscall, strerror(errno));

@@ -24,6 +24,7 @@
 
 #include <stdbool.h>
 #include <ctype.h>
+#include <sys/stat.h>
 
 const char	*get_signal_name(int signo);
 const char	*get_siginfo_code_name(int si_code);
@@ -34,5 +35,6 @@ int			print_signal_info(pid_t tracee_pid);
 void		format_write(pid_t pid, struct user_regs_struct *regs);
 void		escape_string(const char *input, char *output, size_t max_length);
 ssize_t		read_process_memory(pid_t pid, void *remote_addr, void *local_buffer, size_t length);
+char		*get_full_path(const char *filename);
 
 #endif
