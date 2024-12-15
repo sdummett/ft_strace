@@ -55,7 +55,7 @@ int start_tracing(pid_t tracee_pid)
 		if (WIFEXITED(status))
 		{
 			if (!is_syscall_entry)
-				fprintf(stderr, " = ?\n");
+				fprintf(stderr, ") = ?\n");
 			fprintf(stderr, "+++ exited with %d +++\n", WEXITSTATUS(status));
 			exit(WEXITSTATUS(status));
 		}
@@ -87,7 +87,6 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	printf("Found file: %s\n", file_path);
 	free(file_path);
 
 	pid_t pid = fork();
