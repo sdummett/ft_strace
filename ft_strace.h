@@ -31,6 +31,8 @@
 #include <sys/mman.h>
 #include <elf.h>
 
+#include <errno_table.h>
+
 typedef struct s_i386_user_regs
 {
 	uint32_t ebx;
@@ -122,4 +124,4 @@ void		escape_string(const char *input, char *output, size_t max_length);
 ssize_t		read_process_memory(pid_t pid, void *remote_addr, void *local_buffer, size_t length);
 char		*get_full_path(const char *filename);
 
-#endif
+#endif // FT_STRACE_H

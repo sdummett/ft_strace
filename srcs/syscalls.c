@@ -147,6 +147,16 @@ void print_syscall_entry(pid_t tracee_pid)
 	print_syscall_args(syscall_number, args, tracee_pid, arch);
 }
 
+const char *errno_to_name(int err)
+{
+	for (int i = 0; errno_names[i].name != NULL; i++)
+	{
+		if (errno_names[i].code == err)
+			return errno_names[i].name;
+	}
+	return NULL;
+}
+
 void print_syscall_exit(pid_t tracee_pid)
 {
 	struct user_regs_struct regs;
@@ -154,5 +164,15 @@ void print_syscall_exit(pid_t tracee_pid)
 	if (ptrace(PTRACE_GETREGS, tracee_pid, 0, &regs) == -1)
 		print_error_and_exit("print_syscall_exit", "ptrace(PTRACE_GETREGS)");
 
-	fprintf(stderr, ") = %lld\n", regs.rax);
+	long long retval = (long long)regs.rax;
+	if (retval < 0)
+	{
+		int err = -retval;
+		const char *err_name = errno_to_name(err);
+		if (!err_name)
+			err_name = "UNKNOWN_ERRNO";
+		fprintf(stderr, ") = -1 %s (%s)\n", err_name, strerror(err));
+	}
+	else
+		fprintf(stderr, ") = %lld\n", retval);
 }
