@@ -87,7 +87,32 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	int fd = open(file_path, O_RDONLY);
+	if (fd == -1)
+	{
+		free(file_path);
+		print_error_and_exit("main", "open");
+	}
+
+	Elf64_Ehdr *ehdr = mmap(NULL, file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (ehdr == MAP_FAILED)
+	{
+		close(fd);
+		free(file_path);
+		print_error_and_exit("main", "mmap");
+	}
+
+	int binary_arch = ehdr->e_ident[EI_CLASS];
+
+	munmap(ehdr, file_stat.st_size);
+	close(fd);
 	free(file_path);
+
+	if (binary_arch != ELFCLASS64 && binary_arch != ELFCLASS32)
+	{
+		fprintf(stderr, "%s: Unknown architecture for %s\n", argv[0], argv[1]);
+		return 1;
+	}
 
 	pid_t pid = fork();
 	if (pid == -1)

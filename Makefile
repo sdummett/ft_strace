@@ -12,7 +12,7 @@ CC = cc
 #       FLAGS         #
 # ******************* #
 
-CFLAGS = -Wall -Wextra -Werror -D_GNU_SOURCE
+CFLAGS = -Wall -Wextra -Werror
 
 # ******************* #
 #       SOURCES       #
@@ -21,7 +21,6 @@ SRCS = srcs/main.c \
 		srcs/signals.c \
 		srcs/syscalls.c \
 		srcs/utils.c \
-		srcs/format_write.c
 
 SYS_TAB_H = syscall_table.h
 
@@ -43,21 +42,6 @@ $(OBJ_DIRS):
 
 all: $(NAME)
 
-# Generate a fresh systable if a new syscall is added to the kernel
-# generate_syscall_table: syscall_table.h
-# generate_syscall_table: $(SYS_TAB_H)
-# $(SYS_TAB_H):
-# 	@echo "[+] Generating syscall_table.h"
-# 	@echo -e "#ifndef SYSCALL_TABLE_H" > $(SYS_TAB_H)
-# 	@echo -e "#define SYSCALL_TABLE_H\n" >> $(SYS_TAB_H)
-# 	@echo -e "const char *g_syscall_names[] = {\n" >> $(SYS_TAB_H)
-# 	@ausyscall --dump | awk 'NR > 1 { printf "\t[%s] = \"%s\",\n", toupper($$1), $$2 }' >> $(SYS_TAB_H)
-# 	@echo -e "};\n" >> $(SYS_TAB_H)
-# 	@echo "#endif //SYSCALL_TABLE_H" >> $(SYS_TAB_H)
-
-test:
-	./unit-tests.sh
-
 debug: CFLAGS += -g3
 debug: $(NAME)
 
@@ -65,7 +49,6 @@ clean:
 	rm -rf objs
 
 fclean: clean
-# rm -f $(SYS_TAB_H)
 	rm -f $(NAME)
 
 re: fclean all

@@ -1,24 +1,9 @@
-#ifndef SYSCALLENT_H
-#define SYSCALLENT_H
+#ifndef SYSCALLENT_X64_H
+#define SYSCALLENT_X64_H
 
-typedef enum
-{
-	ARG_TYPE_INT,
-	ARG_TYPE_LONG,
-	ARG_TYPE_PTR,
-	ARG_TYPE_STR,
-	ARG_TYPE_SIZE,
-} arg_type;
+#include "ft_strace.h"
 
-typedef struct syscall_entry_s
-{
-	int number;
-	const char *name;
-	int num_args;
-	arg_type arg_types[6];
-} syscall_entry_t;
-
-static syscall_entry_t syscall_table[] = {
+static t_syscall_entry syscall_table_x64[] = {
 	{0, "read", 3, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_SIZE}},
 	{1, "write", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_SIZE}},
 	{2, "open", 3, {ARG_TYPE_STR, ARG_TYPE_INT, ARG_TYPE_INT}},
@@ -329,8 +314,8 @@ static syscall_entry_t syscall_table[] = {
 	{307, "sendmmsg", 4, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_INT}},
 	{308, "setns", 2, {ARG_TYPE_INT, ARG_TYPE_INT}},
 	{309, "getcpu", 3, {ARG_TYPE_PTR, ARG_TYPE_PTR, ARG_TYPE_PTR}},
-	{310, "process_vm_readv", 6, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_LONG}},
-	{311, "process_vm_writev", 6, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_LONG}},
+	{310, "process_vm_readv", 6, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_LONG, ARG_TYPE_PTR, ARG_TYPE_LONG, ARG_TYPE_LONG}},
+	{311, "process_vm_writev", 6, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_LONG, ARG_TYPE_PTR, ARG_TYPE_LONG, ARG_TYPE_LONG}},
 	{312, "kcmp", 5, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_LONG, ARG_TYPE_LONG}},
 	{313, "finit_module", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT}},
 	{314, "sched_setattr", 3, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT}},
@@ -343,7 +328,7 @@ static syscall_entry_t syscall_table[] = {
 	{321, "bpf", 3, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT}},
 	{322, "execveat", 5, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_PTR, ARG_TYPE_PTR, ARG_TYPE_INT}},
 	{323, "userfaultfd", 1, {ARG_TYPE_INT}},
-	{324, "membarrier", 2, {ARG_TYPE_INT, ARG_TYPE_INT}},
+	{324, "membarrier", 3, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT}},
 	{325, "mlock2", 3, {ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_INT}},
 	{326, "copy_file_range", 6, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_INT}},
 	{327, "preadv2", 5, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_LONG, ARG_TYPE_INT}},
@@ -354,6 +339,50 @@ static syscall_entry_t syscall_table[] = {
 	{332, "statx", 5, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_PTR}},
 	{333, "io_pgetevents", 5, {ARG_TYPE_LONG, ARG_TYPE_LONG, ARG_TYPE_LONG, ARG_TYPE_PTR, ARG_TYPE_PTR}},
 	{334, "rseq", 4, {ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_INT, ARG_TYPE_INT}},
-	{335, "uretprobe", 0, {}}};
+	{335, "uretprobe", 0, {}},
+	{424, "pidfd_send_signal", 3, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{425, "io_uring_setup", 2, {ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{426, "io_uring_enter", 4, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{427, "io_uring_register", 3, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{428, "open_tree", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT}},
+	{429, "move_mount", 5, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT}},
+	{430, "fsopen", 2, {ARG_TYPE_STR, ARG_TYPE_INT}},
+	{431, "fsconfig", 5, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_PTR, ARG_TYPE_INT}},
+	{432, "fsmount", 3, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{433, "fspick", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT}},
+	{434, "pidfd_open", 2, {ARG_TYPE_INT, ARG_TYPE_INT}},
+	{435, "clone3", 2, {ARG_TYPE_PTR, ARG_TYPE_SIZE}},
+	{436, "close_range", 3, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{437, "openat2", 3, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_PTR}},
+	{438, "pidfd_getfd", 3, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{439, "faccessat2", 4, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{440, "process_madvise", 5, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{441, "epoll_pwait2", 5, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{442, "mount_setattr", 4, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{443, "quotactl_fd", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_PTR}},
+	{444, "landlock_create_ruleset", 3, {ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_INT}},
+	{445, "landlock_add_rule", 4, {ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT}},
+	{446, "landlock_restrict_self", 2, {ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{447, "memfd_secret", 1, {ARG_TYPE_INT}},
+	{448, "process_mrelease", 1, {ARG_TYPE_INT}},
+	{449, "futex_waitv", 3, {ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{450, "set_mempolicy_home_node", 5, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_PTR, ARG_TYPE_INT}},
+	{451, "cachestat", 5, {ARG_TYPE_STR, ARG_TYPE_PTR, ARG_TYPE_PTR, ARG_TYPE_PTR, ARG_TYPE_PTR}},
+	{452, "fchmodat2", 4, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{453, "map_shadow_stack", 3, {ARG_TYPE_PTR, ARG_TYPE_SIZE, ARG_TYPE_INT}},
+	{454, "futex_wake", 3, {ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_INT}},
+	{455, "futex_wait", 3, {ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{456, "futex_requeue", 5, {ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT}},
+	{457, "statmount", 3, {ARG_TYPE_STR, ARG_TYPE_PTR, ARG_TYPE_INT}},
+	{458, "listmount", 3, {ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{459, "lsm_get_self_attr", 3, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_PTR}},
+	{460, "lsm_set_self_attr", 3, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_INT}},
+	{461, "lsm_list_modules", 3, {ARG_TYPE_PTR, ARG_TYPE_INT, ARG_TYPE_PTR}},
+	{462, "mseal", 1, {ARG_TYPE_INT}},
+	{463, "setxattrat", 5, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_STR, ARG_TYPE_PTR, ARG_TYPE_INT}},
+	{464, "getxattrat", 4, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_STR, ARG_TYPE_PTR}},
+	{465, "listxattrat", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_PTR}},
+	{466, "removexattrat", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_STR}},
+};
 
-#endif // SYSCALLENT_H
+#endif // SYSCALLENT_X64_H
