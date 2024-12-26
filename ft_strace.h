@@ -32,6 +32,7 @@
 #include <elf.h>
 
 #include <errno_table.h>
+#include <signal_table.h>
 
 typedef struct s_i386_user_regs
 {

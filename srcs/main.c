@@ -65,6 +65,7 @@ int start_tracing(pid_t tracee_pid)
 				fprintf(stderr, " = ?\n");
 			fprintf(stderr, "+++ killed by %s +++\n", get_signal_name(WTERMSIG(status)));
 			raise(WTERMSIG(status));
+			exit(status);
 		}
 	}
 	return EXIT_SUCCESS;
