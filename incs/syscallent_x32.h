@@ -3,6 +3,20 @@
 
 #include "ft_strace.h"
 
+/*
+ * https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_32.tbl
+ *
+ * This table defines system call entries for 32-bit binaries.
+ * Each entry contains:
+ *   - The syscall number
+ *   - The syscall name (as found in Linux source or man pages)
+ *   - The number of arguments
+ *   - The types of those arguments (e.g., integer, pointer, size, etc.)
+ *
+ * The table includes a comprehensive list of x86 32-bit system calls.
+ * For brevity, only a portion of these entries is shown here.
+ */
+
 static t_syscall_entry syscall_table_x32[] = {
 	{0, "restart_syscall", 0, {}},
 	{1, "exit", 1, {ARG_TYPE_INT}},
@@ -462,4 +476,4 @@ static t_syscall_entry syscall_table_x32[] = {
 	{466, "removexattrat", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_STR}},
 };
 
-#endif /* SYSCALLENT_X32_H */
+#endif // SYSCALLENT_X32_H

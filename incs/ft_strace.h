@@ -1,29 +1,27 @@
 #ifndef FT_STRACE_H
 #define FT_STRACE_H
 
-#define _GNU_SOURCE // Needed for process_vm_readv
+// Define _GNU_SOURCE so we can use process_vm_readv
+#define _GNU_SOURCE
 
 #define SYSCALL_TRAP (SIGTRAP | 0x80)
 #define SIGINFO_STR_SIZE 128
 #define MAX_BUFFER_SIZE 256
 
-/* C standard library */
+/*
+ * Standard and POSIX headers
+ */
 #include <errno.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* POSIX */
 #include <unistd.h>
 #include <sys/user.h>
 #include <sys/wait.h>
-
-/* Linux */
 #include <syscall.h>
 #include <sys/ptrace.h>
 #include <sys/uio.h>
-
 #include <stdbool.h>
 #include <ctype.h>
 #include <sys/stat.h>
@@ -31,9 +29,15 @@
 #include <sys/mman.h>
 #include <elf.h>
 
+/*
+ * Custom tables for errno values and signals
+ */
 #include <errno_table.h>
 #include <signal_table.h>
 
+/*
+ * Structures for 32-bit (i386) register state
+ */
 typedef struct s_i386_user_regs
 {
 	uint32_t ebx;
@@ -55,6 +59,9 @@ typedef struct s_i386_user_regs
 	uint32_t xss;
 } t_i386_user_regs;
 
+/*
+ * Structures for 64-bit (x86_64) register state
+ */
 typedef struct s_x86_64_user_regs
 {
 	uint64_t r15;
@@ -86,18 +93,27 @@ typedef struct s_x86_64_user_regs
 	uint64_t gs;
 } t_x86_64_user_regs;
 
+/*
+ * Union that can represent either 32-bit or 64-bit registers
+ */
 typedef union u_user_regs
 {
 	t_i386_user_regs regs32;
 	t_x86_64_user_regs regs64;
 } t_user_regs;
 
+/*
+ * Architecture enum to differentiate between 32-bit and 64-bit binaries
+ */
 typedef enum e_arch
 {
 	X_32 = 32,
 	X_64 = 64,
 } t_arch;
 
+/*
+ * Enum describing the type of each syscall argument
+ */
 typedef enum e_arg_type
 {
 	ARG_TYPE_INT,
@@ -107,6 +123,13 @@ typedef enum e_arg_type
 	ARG_TYPE_SIZE,
 } t_arg_type;
 
+/*
+ * Structure describing a single syscall:
+ * - number: syscall number
+ * - name: human-readable name
+ * - num_args: how many arguments it takes
+ * - arg_types: the type of each argument
+ */
 typedef struct s_syscall_entry
 {
 	long unsigned int number;
@@ -115,15 +138,19 @@ typedef struct s_syscall_entry
 	t_arg_type arg_types[6];
 } t_syscall_entry;
 
-const char	*get_signal_name(int signo);
-const char	*get_siginfo_code_name(int si_code);
-void		print_syscall_entry(pid_t tracee_pid);
-void		print_syscall_exit(pid_t tracee_pid);
-void		print_error_and_exit(const char *function, const char *syscall);
-int			print_signal_info(pid_t tracee_pid);
-void		escape_string(const char *input, char *output, size_t max_length);
-ssize_t		read_process_memory(pid_t pid, void *remote_addr, void *local_buffer, size_t length);
-char		*get_full_path(const char *filename);
-void		block_signals();
+/*
+ * Function prototypes for signal handling, syscall entry/exit printing,
+ * error handling, memory reads, etc.
+ */
+const char *get_signal_name(int signo);
+const char *get_siginfo_code_name(int si_code);
+void print_syscall_entry(pid_t tracee_pid);
+void print_syscall_exit(pid_t tracee_pid);
+void print_error_and_exit(const char *function, const char *syscall);
+int print_signal_info(pid_t tracee_pid);
+void escape_string(const char *input, char *output, size_t max_length);
+ssize_t read_process_memory(pid_t pid, void *remote_addr, void *local_buffer, size_t length);
+char *get_full_path(const char *filename);
+void block_signals();
 
 #endif // FT_STRACE_H

@@ -3,6 +3,20 @@
 
 #include "ft_strace.h"
 
+/*
+ * https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
+ *
+ * This table lists system call entries for 64-bit binaries.
+ * Each entry includes:
+ *   - The syscall number
+ *   - The syscall name
+ *   - How many arguments it has
+ *   - The types of each argument (int, ptr, string, etc.)
+ *
+ * The table below covers a wide range of system calls.
+ * Only part of the list is shown here for brevity.
+ */
+
 static t_syscall_entry syscall_table_x64[] = {
 	{0, "read", 3, {ARG_TYPE_INT, ARG_TYPE_PTR, ARG_TYPE_SIZE}},
 	{1, "write", 3, {ARG_TYPE_INT, ARG_TYPE_STR, ARG_TYPE_SIZE}},

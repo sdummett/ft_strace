@@ -2,10 +2,10 @@
 
 int execute_tracee(char **argv)
 {
-	// Indique au parent qu'il peut attacher ce processus
+	// Stop this process so the parent can attach using ptrace
 	raise(SIGSTOP);
 
-	// Exécute le programme à tracer
+	// Replace the current process image with the target program
 	if (execvp(argv[1], argv + 1))
 		print_error_and_exit("execute_tracee", "execvp");
 	return EXIT_SUCCESS;
@@ -13,14 +13,17 @@ int execute_tracee(char **argv)
 
 int start_tracing(pid_t tracee_pid)
 {
-	// Parent : initialisation du traçage
+	// Attach to the child process for tracing
 	if (ptrace(PTRACE_SEIZE, tracee_pid, 0, 0) == -1)
 		print_error_and_exit("start_tracing", "ptrace(PTRACE_SEIZE)");
 
+	// Wait for the child to stop before setting ptrace options
 	if (waitpid(tracee_pid, 0, 0) == -1)
 		print_error_and_exit("start_tracing", "waitpid");
 
-	if (ptrace(PTRACE_SETOPTIONS, tracee_pid, 0, PTRACE_O_EXITKILL | PTRACE_O_TRACESYSGOOD) == -1)
+	// Configure ptrace to kill the tracee on unexpected exits and distinguish syscall stops
+	if (ptrace(PTRACE_SETOPTIONS, tracee_pid, 0,
+			   PTRACE_O_EXITKILL | PTRACE_O_TRACESYSGOOD) == -1)
 		print_error_and_exit("start_tracing", "ptrace(PTRACE_SETOPTIONS)");
 
 	bool is_syscall_entry = true;
@@ -28,7 +31,7 @@ int start_tracing(pid_t tracee_pid)
 
 	while (1)
 	{
-		// Continue le processus jusqu'au prochain syscall ou signal
+		// Resume the process until the next syscall or signal
 		if (ptrace(PTRACE_SYSCALL, tracee_pid, 0, signal_number) == -1)
 			print_error_and_exit("start_tracing", "ptrace(PTRACE_SYSCALL)");
 		signal_number = 0;
@@ -39,7 +42,7 @@ int start_tracing(pid_t tracee_pid)
 
 		int stop_signal = WSTOPSIG(status);
 
-		// Gestion des signaux autres que les arrêts de syscall
+		// If the process stopped for a reason unrelated to a syscall, handle the signal
 		if (WIFSTOPPED(status) && stop_signal != SYSCALL_TRAP)
 			signal_number = print_signal_info(tracee_pid);
 		else if (WIFSTOPPED(status) && stop_signal == SYSCALL_TRAP)
@@ -51,9 +54,10 @@ int start_tracing(pid_t tracee_pid)
 			is_syscall_entry = !is_syscall_entry;
 		}
 
-		// Gestion de la fin du processus tracé
+		// Check if the tracee has exited or was killed by a signal
 		if (WIFEXITED(status))
 		{
+			// If we were still printing syscall args, close them properly
 			if (!is_syscall_entry)
 				fprintf(stderr, ") = ?\n");
 			fprintf(stderr, "+++ exited with %d +++\n", WEXITSTATUS(status));
@@ -73,6 +77,7 @@ int start_tracing(pid_t tracee_pid)
 
 int main(int argc, char *argv[])
 {
+	// Block certain signals in the parent to avoid interruptions
 	block_signals();
 
 	if (argc <= 1)
@@ -84,9 +89,11 @@ int main(int argc, char *argv[])
 	struct stat file_stat;
 	char *file_path = get_full_path(argv[1]);
 
+	// If the file isn't found or stat fails, report the error
 	if (!file_path || stat(file_path, &file_stat) < 0)
 	{
-		fprintf(stderr, "%s: Can't stat '%s': %s\n", argv[0], argv[1], strerror(errno));
+		fprintf(stderr, "%s: Can't stat '%s': %s\n",
+				argv[0], argv[1], strerror(errno));
 		return 1;
 	}
 
@@ -97,6 +104,7 @@ int main(int argc, char *argv[])
 		print_error_and_exit("main", "open");
 	}
 
+	// Map the file into memory to inspect its ELF header
 	Elf64_Ehdr *ehdr = mmap(NULL, file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (ehdr == MAP_FAILED)
 	{
@@ -111,16 +119,19 @@ int main(int argc, char *argv[])
 	close(fd);
 	free(file_path);
 
+	// Check if it's a 32-bit or 64-bit ELF; otherwise it's unsupported
 	if (binary_arch != ELFCLASS64 && binary_arch != ELFCLASS32)
 	{
 		fprintf(stderr, "%s: Unknown architecture for %s\n", argv[0], argv[1]);
 		return 1;
 	}
 
+	// Fork to create a child (tracee) and parent (traceur)
 	pid_t pid = fork();
 	if (pid == -1)
 		print_error_and_exit("main", "fork");
 	else if (pid == 0)
 		return execute_tracee(argv);
+
 	return start_tracing(pid);
 }

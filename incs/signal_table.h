@@ -3,11 +3,19 @@
 
 #include <signal.h>
 
+/*
+ * Maps signal numbers to their corresponding string names.
+ * This is used for retrieving a readable representation of each signal.
+ */
 typedef struct {
     int         signo;
     const char *name;
 } signal_entry_t;
 
+/*
+ * This static table associates well-known signals with their names.
+ * The entry {0, NULL} marks the end of the list.
+ */
 static const signal_entry_t signals_table[] = {
     { SIGHUP,    "SIGHUP"    },
     { SIGINT,    "SIGINT"    },
@@ -39,7 +47,7 @@ static const signal_entry_t signals_table[] = {
     { SIGIO,     "SIGIO"     },
     { SIGPWR,    "SIGPWR"    },
     { SIGSYS,    "SIGSYS"    },
-	{ 0,         NULL        },
+    { 0,         NULL        },
 };
 
-#endif /* SIGNAL_TABLE_H */
+#endif // SIGNAL_TABLE_H
