@@ -39,6 +39,26 @@ const char *get_signal_name(int signo)
 	return "UNKNOWN";
 }
 
+void block_signals()
+{
+	sigset_t set;
+
+	if (sigemptyset(&set) == -1)
+		print_error_and_exit("block_signals", "sigemptyset(&set)");
+
+	if (sigaddset(&set, SIGHUP) == -1 ||
+		sigaddset(&set, SIGINT) == -1 ||
+		sigaddset(&set, SIGQUIT) == -1 ||
+		sigaddset(&set, SIGPIPE) == -1 ||
+		sigaddset(&set, SIGTERM) == -1)
+	{
+		print_error_and_exit("block_signals", "sigaddset(&set, SIGNAL)");
+	}
+
+	if (sigprocmask(SIG_BLOCK, &set, NULL) == -1)
+		print_error_and_exit("block_signals", "sigprocmask(SIG_BLOCK, &set, NULL");
+}
+
 const char *get_siginfo_code_name(int si_code)
 {
 	switch (si_code)

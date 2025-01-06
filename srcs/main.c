@@ -73,6 +73,8 @@ int start_tracing(pid_t tracee_pid)
 
 int main(int argc, char *argv[])
 {
+	block_signals();
+
 	if (argc <= 1)
 	{
 		fprintf(stderr, "%s: must have PROG [ARGS]\n", argv[0]);
