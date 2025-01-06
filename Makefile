@@ -12,7 +12,7 @@ CC = cc
 #       FLAGS         #
 # ******************* #
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -Iincs
 
 # ******************* #
 #       SOURCES       #
